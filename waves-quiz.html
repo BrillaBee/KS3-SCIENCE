@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waves Quiz - 25 Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .quiz-info {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .question-container {
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .question {
+            display: none;
+        }
+
+        .question.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            padding: 18px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-next {
+            background: #28a745;
+            color: white;
+            display: none;
+        }
+
+        .btn-next:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .results {
+            display: none;
+            text-align: center;
+            padding: 50px 30px;
+        }
+
+        .results.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .results h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-value {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .results-breakdown {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-restart {
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-restart:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="header">
+            <h1>🌊 Waves Quiz</h1>
+            <p>Test your knowledge on water waves, light waves, reflection, refraction & color</p>
+        </div>
+
+        <div class="quiz-info">
+            <div class="info-item">
+                <div class="info-label">Question</div>
+                <div class="info-value"><span id="currentQuestion">1</span>/25</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Score</div>
+                <div class="info-value" id="scoreDisplay">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Correct</div>
+                <div class="info-value" id="correctDisplay">0</div>
+            </div>
+        </div>
+
+        <div class="question-container" id="quizContainer"></div>
+
+        <div class="results" id="results">
+            <h2>Quiz Complete! 🎉</h2>
+            <div class="score-circle">
+                <div class="score-value" id="finalScore">0%</div>
+                <div class="score-label">Score</div>
+            </div>
+            <div class="results-breakdown">
+                <div class="breakdown-item">
+                    <span><strong>Total Questions:</strong></span>
+                    <span>25</span>
+                </div>
+                <div class="breakdown-item">
+                    <span><strong>Correct Answers:</strong></span>
+                    <span id="finalCorrect">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span><strong>Incorrect Answers:</strong></span>
+                    <span id="finalIncorrect">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span><strong>Percentage:</strong></span>
+                    <span id="finalPercentage">0%</span>
+                </div>
+            </div>
+            <button class="btn-restart" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What type of wave are water waves?",
+                options: ["Longitudinal waves", "Transverse waves", "Electromagnetic waves", "Standing waves"],
+                correct: 1,
+                explanation: "Water waves are transverse waves because they have undulations (up and down movements) that are at right angles to the direction the wave is travelling in."
+            },
+            {
+                question: "What is the highest part of a wave called?",
+                options: ["Trough", "Crest", "Amplitude", "Wavelength"],
+                correct: 1,
+                explanation: "The crest is the highest part of the wave."
+            },
+            {
+                question: "What is the lowest part of a wave called?",
+                options: ["Crest", "Amplitude", "Trough", "Displacement"],
+                correct: 2,
+                explanation: "The trough is the lowest part of the wave."
+            },
+            {
+                question: "What is amplitude?",
+                options: ["The distance between two crests", "The maximum displacement from the middle of the wave to a crest or trough", "The speed of the wave", "The frequency of the wave"],
+                correct: 1,
+                explanation: "The amplitude is the maximum displacement — the distance from the middle of the wave to a crest or trough."
+            },
+            {
+                question: "When two identical crests meet, what happens to the displacement?",
+                options: ["It cancels out", "It doubles", "It stays the same", "It becomes a trough"],
+                correct: 1,
+                explanation: "When two identical crests meet, the height of each wave is added together, so the crest height doubles. This is called superposition."
+            },
+            {
+                question: "What is the name of the effect when two waves meet and their displacements combine?",
+                options: ["Reflection", "Refraction", "Superposition", "Diffraction"],
+                correct: 2,
+                explanation: "Superposition is the effect that causes the results when two waves meet and their displacements combine briefly."
+            },
+            {
+                question: "What is light?",
+                options: ["A particle only", "A wave that transfers energy", "A type of matter", "A sound wave"],
+                correct: 1,
+                explanation: "Light is a wave that transfers energy. Light is produced by luminous objects."
+            },
+            {
+                question: "What is the speed of light in a vacuum?",
+                options: ["3 × 10⁶ m/s", "3 × 10⁸ m/s", "3 × 10⁷ m/s", "3 × 10⁹ m/s"],
+                correct: 1,
+                explanation: "The speed of light waves in a vacuum is always 3 × 10⁸ m/s (that's three hundred million metres per second). It's a constant."
+            },
+            {
+                question: "What type of wave are light waves?",
+                options: ["Longitudinal waves", "Mechanical waves", "Transverse waves", "Sound waves"],
+                correct: 2,
+                explanation: "Light waves are transverse waves, like water waves, they have undulations at right angles to the direction the wave is travelling."
+            },
+            {
+                question: "What happens to the speed of light when it travels from a vacuum into matter?",
+                options: ["It increases", "It stays the same", "It slows down", "It stops completely"],
+                correct: 2,
+                explanation: "Although light is slower when it has to travel through matter (like air or water), it's still so fast that its movement appears instant to the human eye."
+            },
+            {
+                question: "What is reflection?",
+                options: ["When light bends", "When a wave hits a surface", "When light changes color", "When light disappears"],
+                correct: 1,
+                explanation: "Reflection is what happens when a wave hits a surface."
+            },
+            {
+                question: "What type of surface do mirrors have that allows them to reflect light?",
+                options: ["Rough surface", "Dull surface", "Smooth, shiny surface", "Transparent surface"],
+                correct: 2,
+                explanation: "Mirrors have a very smooth shiny surface, which allows each light ray to reflect off it at the same angle, giving a clear reflection. This is specular reflection."
+            },
+            {
+                question: "According to the law of reflection, if the angle of incidence is 39°, what is the angle of reflection?",
+                options: ["78°", "51°", "39°", "90°"],
+                correct: 2,
+                explanation: "The angle of incidence = angle of reflection. Both are always measured between the light ray and the normal."
+            },
+            {
+                question: "When light travels from a less dense medium (like air) to a more dense medium (like glass), in which direction does it bend?",
+                options: ["Away from the normal", "Towards the normal", "It doesn't bend", "Perpendicular to the normal"],
+                correct: 1,
+                explanation: "When light goes from a LESS dense medium to a MORE dense medium, light bends TOWARDS THE NORMAL."
+            },
+            {
+                question: "What is refraction?",
+                options: ["When light bounces off a surface", "When light bends as it crosses a boundary", "When light is absorbed", "When light changes color"],
+                correct: 1,
+                explanation: "Refraction happens when light rays move to a more or less dense substance. When light travels from one transparent medium to another, it bends or refracts."
+            },
+            {
+                question: "A lens that bulges outwards is called a:",
+                options: ["Concave lens", "Convex lens", "Plane lens", "Cylindrical lens"],
+                correct: 1,
+                explanation: "A convex lens bulges outwards. It causes rays of light to converge (move closer together) to a focus."
+            },
+            {
+                question: "What part of the eye focuses light onto the retina?",
+                options: ["Iris", "Pupil", "Lens and cornea", "Optic nerve"],
+                correct: 2,
+                explanation: "The convex lens behind the cornea changes shape to focus light from different distances. In the human eye, the cornea is a transparent 'window' with a convex shape. The cornea does most of the eye's focusing."
+            },
+            {
+                question: "White light is:",
+                options: ["A single color", "A mixture of colors", "Only red light", "Only blue light"],
+                correct: 1,
+                explanation: "White light is NOT just a single colour. White light is actually a mixture of colours."
+            },
+            {
+                question: "What device can split white light into a spectrum of colors?",
+                options: ["Mirror", "Lens", "Prism or raindrop", "Filter"],
+                correct: 2,
+                explanation: "White light can be dispersed (i.e. split up) into a full rainbow of colours using a prism or a raindrop."
+            },
+            {
+                question: "In the visible light spectrum, which color has the lowest frequency?",
+                options: ["Violet", "Blue", "Green", "Red"],
+                correct: 3,
+                explanation: "Light waves increase in frequency from red (low frequency) to violet (high frequency)."
+            },
+            {
+                question: "What happens when white light passes through a red filter?",
+                options: ["All colors pass through", "Only red light passes through", "No light passes through", "The light turns blue"],
+                correct: 1,
+                explanation: "A filter only allows one particular colour of light to go through it. All other colours are ABSORBED by the filter — so they don't get through."
+            },
+            {
+                question: "A blue object looks blue because it:",
+                options: ["Absorbs all blue light", "Reflects blue light and absorbs all other colors", "Only absorbs blue light", "Transmits blue light"],
+                correct: 1,
+                explanation: "Blue jeans are blue because they diffusely reflect blue light and absorb all the other colours."
+            },
+            {
+                question: "What color does a red boot appear under green light?",
+                options: ["Red", "Green", "Black", "Yellow"],
+                correct: 2,
+                explanation: "The boot looks black — it has no red light to reflect and it absorbs the green light. Objects appear to change color in colored light because they can only reflect the colors that are shining on them."
+            },
+            {
+                question: "If a trough with a depth of 2 cm meets a crest with a height of 2 cm, what is the result?",
+                options: ["A 4 cm crest", "A 4 cm trough", "They cancel out, leaving a flat water surface", "A 2 cm crest"],
+                correct: 2,
+                explanation: "If one wave is at a crest and the other is at a trough, you subtract the trough depth from the crest height. So the crest or trough will be smaller and may even cancel out, leaving a flat water surface."
+            },
+            {
+                question: "Why does paper look dull when you shine light on it?",
+                options: ["It absorbs all light", "It reflects light in many different directions (diffuse scattering)", "It is transparent", "It refracts all the light"],
+                correct: 1,
+                explanation: "If the surface is rough and dull, light is reflected back in lots of different directions (scattered). This is diffuse reflection (or diffuse scattering)."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let answered = false;
+
+        function initQuiz() {
+            displayQuestion();
+            updateProgress();
+        }
+
+        function displayQuestion() {
+            const container = document.getElementById('quizContainer');
+            const question = questions[currentQuestionIndex];
+            
+            container.innerHTML = `
+                <div class="question active">
+                    <div class="question-header">
+                        <div class="question-number">Question ${currentQuestionIndex + 1} of 25</div>
+                        <div class="question-text">${question.question}</div>
+                    </div>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <label class="option" onclick="selectOption(${index})">
+                                <input type="radio" name="answer" value="${index}">
+                                <span>${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                    <div class="buttons">
+                        <button class="btn-submit" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+                        <button class="btn-next" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+                    </div>
+                </div>
+            `;
+            
+            answered = false;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            options[index].querySelector('input').checked = true;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (answered) return;
+            
+            const selected = document.querySelector('input[name="answer"]:checked');
+            if (!selected) return;
+            
+            answered = true;
+            const selectedIndex = parseInt(selected.value);
+            const question = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            const feedback = document.getElementById('feedback');
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                feedback.className = 'feedback correct show';
+                feedback.innerHTML = `<strong>✓ Correct!</strong><br>${question.explanation}`;
+                correctAnswers++;
+                score += 4;
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                feedback.className = 'feedback incorrect show';
+                feedback.innerHTML = `<strong>✗ Incorrect.</strong><br>The correct answer is: ${question.options[question.correct]}<br><br>${question.explanation}`;
+            }
+            
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('correctDisplay').textContent = correctAnswers;
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+                updateProgress();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            const percentage = Math.round((correctAnswers / questions.length) * 100);
+            const incorrect = questions.length - correctAnswers;
+            
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('results').classList.add('show');
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('finalCorrect').textContent = correctAnswers;
+            document.getElementById('finalIncorrect').textContent = incorrect;
+            document.getElementById('finalPercentage').textContent = percentage + '%';
+            document.getElementById('progressBar').style.width = '100%';
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('correctDisplay').textContent = '0';
+            initQuiz();
+        }
+
+        // Initialize quiz on page load
+        initQuiz();
+    </script>
+</body>
+</html>
